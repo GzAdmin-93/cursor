@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- SECTION: 🌐 Meta + Title -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Groundzy Login</title>
+
+    <!-- SECTION: 🧠 Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- SECTION: 🌟 Favicon -->
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="https://gzadmin-93.github.io/tree-icons/favecon-02.svg"
+    />
+
+    <!-- SECTION: 🌿 Styles -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div class="container">
+      <!-- SECTION: 🪴 Logo -->
+      <img
+        src="https://gzadmin-93.github.io/tree-icons/GroundzyFullLogo-01.svg"
+        alt="Groundzy Logo"
+        class="logo"
+      />
+
+      <!-- SECTION: Groundzy Version -->
+      <div class="groundzy-version">Loading version...</div>
+
+      <!-- SECTION: 🔐 Login Fields -->
+      <input
+        type="email"
+        id="email"
+        placeholder="email"
+        class="input"
+        required
+      />
+      <input
+        type="password"
+        id="password"
+        placeholder="password"
+        class="input"
+        required
+      />
+
+      <!-- SECTION: 🔘 Buttons -->
+      <div class="buttons">
+        <button class="login" onclick="login()">Log In</button>
+        <a
+          href="https://groundzy.com/signup"
+          class="register"
+          style="text-decoration: none"
+        >
+          <button class="register">Create an Account</button>
+        </a>
+      </div>
+
+      <!-- SECTION: 🔗 Links -->
+      <p class="link">
+        <em><a href="#" onclick="toggleResetForm()">password reset</a></em>
+      </p>
+      <p class="link underline">
+        <em><a href="mailto:info@groundzy.com">contact us</a></em>
+      </p>
+
+      <!-- SECTION: 🔑 Password Reset -->
+      <form id="resetForm" class="hidden" onsubmit="submitPasswordReset(event)">
+        <input
+          type="email"
+          id="resetEmail"
+          placeholder="Enter your email"
+          class="input"
+          required
+        />
+        <button type="submit" class="login">Send Reset Link</button>
+      </form>
+    </div>
+
+    <!-- SECTION: 🔥 Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <!-- SECTION: 🧠 App Script -->
+    <script src="script.js"></script>
+
+    <!-- SECTION: Version Logic -->
+    <script>
+      document.addEventListener("DOMContentLoaded", loadVersion);
+    </script>
+  </body>
+</html>

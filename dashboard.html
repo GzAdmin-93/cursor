@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- SECTION: 🌟 Meta + Title -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>Groundzy Dashboard</title>
+
+  <!-- SECTION: 🌱 Favicon -->
+  <link rel="icon" type="image/svg+xml" href="https://gzadmin-93.github.io/tree-icons/favecon-02.svg" />
+
+  <!-- SECTION: 🧼 CSS Styles -->
+  <link rel="stylesheet" href="dashboard.css" />
+
+  <!-- SECTION: 🔐 Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
+  </head>
+<body>
+
+  <!-- SECTION: 🌿 Top Bar (Logo + Search + Icons) -->
+  <div class="top-bar-container">
+    <div class="top-bar-inner">
+      
+      <!-- SECTION: 🌦️ Weather Box -->
+<div id="weatherBox" class="weather-box hidden">
+  <div style="display: flex; flex-direction: column;">
+  <div style="display: flex; gap: 10px; align-items: center;">
+    <div id="weatherTemp">--°</div>
+    <div id="weatherWind">-- mph</div>
+    <div id="weatherIcon" class="wind-arrow">↑</div>
+  </div>
+  <div id="weatherLocation" style="font-size: 0.75em; margin-top: 2px;">--</div>
+</div>
+
+</div>
+
+      
+
+      <!-- 🌱 Full Logo -->
+      <div id="logoRefreshFull" class="logo-pill logo-full refresh-logo">
+        <img
+          src="https://raw.githubusercontent.com/GzAdmin-93/GZ-Icons/refs/heads/main/Groundzy%20Logo-01.svg"
+          class="logo-img"
+          alt="Groundzy"
+        />
+      </div>
+
+      <!-- 🌱 Mobile Icon Logo -->
+      <div id="logoRefreshIcon" class="logo-pill logo-icon hidden refresh-logo">
+        <img
+          src="https://raw.githubusercontent.com/GzAdmin-93/tree-icons/refs/heads/main/icon-groundzy.svg"
+          class="logo-img"
+          alt="Groundzy Icon"
+        />
+      </div>
+
+      <!-- 🔍 Search Bar -->
+      <div id="searchBar" class="search-bar hidden">
+        <input type="text" id="searchInput" placeholder="Search location, tree code, or tag..." />
+      
+        <!-- ✅ NEW: Enter/Search Button -->
+        <button id="triggerSearchBtn" class="icon-btn small" title="Run Search">
+          <img src="https://cdn.glitch.global/be3220ef-e690-4f1d-8f8e-8985c781477a/icon-search.svg?v=1746299402579" />
+        </button>
+      
+        <button id="closeSearchBtn" class="icon-btn small" title="Close">
+          <img src="https://raw.githubusercontent.com/GzAdmin-93/GZ-Icons/refs/heads/main/icon-close_x-01.svg" />
+        </button>
+      </div>
+      
+
+      <!-- 🔘 Icon Buttons -->
+      <div class="top-buttons" id="topIcons">
+      <button id="gpsBtn" class="icon-btn" title="Use GPS">
+          <img src="https://cdn.glitch.global/be3220ef-e690-4f1d-8f8e-8985c781477a/icon-gps.svg?v=1746299383632" />
+        </button>
+
+        <button id="notificationsBtn" class="icon-btn" title="Notifications">
+          <img id="notificationIcon" src="https://gzadmin-93.github.io/tree-icons/icon-notification.svg" />
+        </button>
+        
+          <button id="searchBtn" class="icon-btn" title="Search">
+          <img src="https://cdn.glitch.global/be3220ef-e690-4f1d-8f8e-8985c781477a/icon-search.svg?v=1746299402579" />
+        </button>
+
+        
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECTION: 🗺️ Google Map Container -->
+  <div id="map"></div>
+
+  <!-- SECTION: 📍 Fixed Center Pin (follows map center) -->
+  <img
+    id="centerPin"
+    class="center-pin"
+    src="https://gzadmin-93.github.io/tree-icons/icon-center-pointer.svg"
+    alt="Center Pin"
+  />
+
+<!-- SECTION: 🗝️ Tree Legend Box -->
+<div class="legend-box-wrapper">
+  <div id="treeLegend" class="legend-box hidden"></div>
+</div>
+
+
+
+  <!-- SECTION: 📱 Bottom Navigation Menu -->
+  <div class="bottom-menu">
+    <a href="#" class="active">
+      <img src="https://raw.githubusercontent.com/GzAdmin-93/GZ-Icons/refs/heads/main/bottomNav_home.svg" alt="Home" />
+    </a>
+    
+    <!-- 🌿 Identify Tree Button -->
+<a href="#" id="identifyTreeBtn" title="Identify Tree">
+  <img src="https://raw.githubusercontent.com/GzAdmin-93/GZ-Icons/refs/heads/main/bottomNav_wizard.svg" alt="Identify" />
+</a>
+
+    
+<a id="addButton" href="#">
+      <img src="https://raw.githubusercontent.com/GzAdmin-93/GZ-Icons/refs/heads/main/bottomNav_add.svg" alt="Add" />
+    </a>
+    
+    <!-- 📷 Screenshot Mode Toggle -->
+<a href="#" id="screenshotToggleBtn" title="Toggle Screenshot Mode">
+  <img src="https://raw.githubusercontent.com/GzAdmin-93/GZ-Icons/refs/heads/main/bottomNav_visibility.svg" alt="Screenshot" />
+</a>
+
+    
+    <a href="#" data-submenu="submenu-account">
+      <img src="https://raw.githubusercontent.com/GzAdmin-93/GZ-Icons/refs/heads/main/bottomNav_settings.svg" alt="Account" />
+    </a>
+  </div>
+
+  <!-- SECTION: ➕ Add Submenu -->
+  <div id="submenu-add" class="submenu hidden">
+    <button class="groundzy-btn" onclick="openTreeModal()">Add Item</button>
+    <button class="groundzy-btn">Add Property</button>
+  </div>
+
+
+  <!-- SECTION: 👤 Account Submenu -->
+  <div id="submenu-account" class="submenu hidden">
+    <button id="tutorial-button" class="groundzy-btn">🎓 View Tutorial</button>
+    <button id="feedback-button" class="groundzy-btn">Feedback / Issues</button>
+    <button class="red-btn" onclick="signOut()">Sign Out</button>
+  </div>
+
+
+
+
+
+
+
+
+<!-- SECTION: 🌳 Add Tree Modal -->
+<div id="treeModal" class="modal hidden">
+  <div class="modal-content">
+    <button class="modal-close-button" onclick="closeModal(this)">×</button>
+  <h2 id="treeModalTitle">New Tree Entry</h2>
+
+    
+    <!-- SECTION: 🔐 Groundzy Code (Edit Mode Only) -->
+<div id="editTreeTINBox" class="modal-section" style="display: none;">
+  <div class="field-value" id="editTreeTINText">--</div>
+  <div class="field-label">TIN (Groundzy Code)</div>
+</div>
+
+    
+
+ <!-- SECTION: 🌱 Tree Basics -->
+<div class="modal-section">
+  <h3 class="section-header">🌱 Tree Info</h3>
+
+  <div class="field-row-3" style="grid-template-columns: 1fr !important;">
+  <div>
+    <label class="field-label">Type</label>
+    <select id="treeType" class="styled-input">
+      <option value="">Select type</option>
+      <option value="Tree">Tree</option>
+      <option value="Shrub">Shrub</option>
+      <option value="Stump">Stump</option>
+      <option value="Other">Other / Unknown</option>
+    </select>
+  </div>
+
+  <div>
+    <label class="field-label">Common Name</label>
+    <input list="speciesList" id="treeSpecies" placeholder="Select or type species..." class="styled-input" />
+    <datalist id="speciesList"></datalist>
+  </div>
+</div>
+
+
+  <!-- ℹ️ Species Notes -->
+  <div id="speciesInfoBox" class="species-notes-box" style="display: none;">
+    <strong>Groundzy Notes:</strong>
+    <p id="speciesInfoText"></p>
+  </div>
+</div>
+
+    
+    
+<!-- 📸 Photo Upload -->
+<div style="margin-top: 16px;">
+  <label class="field-label">Tree Photo (optional)</label>
+  <div style="display: flex; gap: 8px; align-items: center;">
+    <input type="file" id="treePhotoInput" accept="image/*" class="styled-input" style="flex: 1;" />
+    
+    <!-- 🗑️ Trash button -->
+    <button
+      type="button"
+      onclick="removeTreePhoto()"
+      title="Remove photo"
+      style="font-size: 20px; background: none; border: none; cursor: pointer; padding: 4px;"
+    >
+      🗑️
+    </button>
+  </div>
+</div>
+
+
+
+    
+    
+    
+    
+<!-- SECTION: 📏 Age & Structure (Collapsible) -->
+<div class="modal-section">
+  <button class="collapsible-header collapsed" type="button" onclick="toggleCollapse(this)">
+    📏 Age & Structure
+  </button>
+  <div class="collapsible-content" style="display: none;">
+    <div class="field-row-3">
+      <div>
+        <input type="text" id="treeAge" class="styled-input" placeholder="e.g., 30" />
+        <div class="field-label">Estimated Age</div>
+      </div>
+      <div>
+        <input type="text" id="treeHeight" class="styled-input" placeholder="e.g., 25 ft" />
+        <div class="field-label">Height</div>
+      </div>
+      <div>
+        <input type="text" id="treeDBH" class="styled-input" placeholder="e.g., 10 in" />
+        <div class="field-label">Trunk Diameter</div>
+      </div>
+      <div>
+        <input type="text" id="treeCanopy" class="styled-input" placeholder="e.g., 15 ft" />
+        <div class="field-label">Canopy Spread</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+   <!-- SECTION: ❤️ Health & Condition (Collapsible) -->
+<div class="modal-section">
+  <button class="collapsible-header collapsed" type="button" onclick="toggleCollapse(this)">
+    ❤️ Health & Condition
+  </button>
+  <div class="collapsible-content" style="display: none;">
+    <div class="field-row-3">
+      <div>
+        <select id="treeHealth" class="styled-input">
+          <option value="">Select</option>
+          <option>Healthy</option>
+          <option>Fair</option>
+          <option>Poor</option>
+          <option>Dead</option>
+        </select>
+        <div class="field-label">Overall Health</div>
+      </div>
+      <div>
+        <select id="treeStructure" class="styled-input">
+          <option value="">Select</option>
+          <option>Stable</option>
+          <option>Leaning</option>
+          <option>Damaged</option>
+          <option>Cracked</option>
+          <option>Split</option>
+        </select>
+        <div class="field-label">Structure</div>
+      </div>
+      <div>
+        <select id="treeLeafCondition" class="styled-input">
+          <option value="">Select</option>
+          <option>Normal</option>
+          <option>Discolored</option>
+          <option>Wilting</option>
+          <option>Sparse</option>
+        </select>
+        <div class="field-label">Leaf Condition</div>
+      </div>
+      <div>
+        <input type="date" id="lastInspected" class="styled-input" />
+        <div class="field-label">Last Inspected</div>
+      </div>
+      <div>
+        <input type="date" id="nextInspection" class="styled-input" />
+        <div class="field-label">Next Inspection</div>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+  
+<!-- SECTION: 🏷️ Tag & Location (Collapsible) -->
+<div class="modal-section">
+  <button class="collapsible-header collapsed" type="button" onclick="toggleCollapse(this)">
+    🏷️ Tag & Location
+  </button>
+  <div class="collapsible-content" style="display: none;">
+    <div class="field-row-3">
+      <div>
+        <input type="text" id="treeTagCode" class="styled-input" placeholder="Scan or type code..." />
+        <div class="field-label">Tag Code</div>
+      </div>
+      <div>
+        <input type="text" id="treeLatitude" class="styled-input" placeholder="e.g., 41.123456" />
+        <div class="field-label">Latitude</div>
+      </div>
+      <div>
+        <input type="text" id="treeLongitude" class="styled-input" placeholder="e.g., -88.123456" />
+        <div class="field-label">Longitude</div>
+      </div>
+    </div>
+
+    <!-- 📍 Set Location Button -->
+    <div style="margin-top: 10px;">
+      <button class="submenu-btn green" onclick="startLocationPicker()">📍 Set Location on Map</button>
+    </div>
+
+    <!-- 🏠 Full Address -->
+    <div style="margin-top: 10px;">
+      <input type="text" id="treeAddress" class="styled-input" placeholder="Street address..." />
+      <div class="field-label">Full Address</div>
+    </div>
+
+    <div style="margin-top: 12px;">
+      <textarea id="treeLocationNotes" class="styled-input" placeholder="e.g., North side of parking lot..."></textarea>
+      <div class="field-label">Location Notes</div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- SECTION: 🌍 Origin & Classification (Collapsible) -->
+<div class="modal-section">
+  <button class="collapsible-header collapsed" type="button" onclick="toggleCollapse(this)">
+    🌍 Origin & Classification
+  </button>
+  <div class="collapsible-content" style="display: none;">
+    <div class="field-row-3">
+      <div>
+        <input type="text" id="treeGenus" class="styled-input" placeholder="e.g., Quercus" />
+        <div class="field-label">Genus</div>
+      </div>
+      <div>
+        <input type="text" id="treeSpeciesName" class="styled-input" placeholder="e.g., robur" />
+        <div class="field-label">Species</div>
+      </div>
+      <div>
+        <input type="text" id="treeBotanicalName" class="styled-input" placeholder="Auto-filled or editable" />
+        <div class="field-label">Full Botanical Name</div>
+      </div>
+      <div>
+        <input type="text" id="treeFamily" class="styled-input" placeholder="e.g., Fagaceae" />
+        <div class="field-label">Family</div>
+      </div>
+      <div>
+        <input type="text" id="treeAlternateNames" class="styled-input" placeholder="e.g., White Oak, Stave Oak" />
+        <div class="field-label">Alternate Common Names</div>
+      </div>
+      <div>
+        <select id="treeOriginStatus" class="styled-input">
+          <option value="">Select</option>
+          <option value="Native">Native</option>
+          <option value="Non-native">Non-native</option>
+          <option value="Invasive">Invasive</option>
+          <option value="Endangered">Endangered</option>
+        </select>
+        <div class="field-label">Origin Status</div>
+      </div>
+      <div>
+        <input type="text" id="treeUSDAZone" class="styled-input" placeholder="e.g., 5b" />
+        <div class="field-label">USDA Hardiness Zone</div>
+      </div>
+      <div>
+        <input type="text" id="treeGrowthHabit" class="styled-input" placeholder="e.g., Multi-stem, Weeping..." />
+        <div class="field-label">Growth Habit</div>
+      </div>
+      <div>
+        <input type="text" id="treeLifespan" class="styled-input" placeholder="e.g., Long, Medium..." />
+        <div class="field-label">Lifespan Category</div>
+      </div>
+      <div>
+        <input type="text" id="treeEcosystemRole" class="styled-input" placeholder="e.g., Pollinator, Shade..." />
+        <div class="field-label">Ecosystem Role</div>
+      </div>
+    </div>
+    <div style="margin-top: 12px;">
+      <textarea id="treeUseCategories" class="styled-input" placeholder="e.g., Ornamental, Edible, Windbreak"></textarea>
+      <div class="field-label">Use Categories</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- SECTION: 🚨 Issues & Recommendations (Collapsible) -->
+<div class="modal-section">
+  <button class="collapsible-header collapsed" type="button" onclick="toggleCollapse(this)">
+    🚨 Issues & Recommendations
+  </button>
+  <div class="collapsible-content" style="display: none;">
+
+    <!-- 🐛 Issues Observed -->
+    <h4 style="margin-top: 0;">🐛 Issues Observed</h4>
+    <div class="field-row-3">
+      <div>
+        <input type="text" id="treePests" class="styled-input" placeholder="e.g., Aphids, Borers..." />
+        <div class="field-label">Pests</div>
+      </div>
+      <div>
+        <input type="text" id="treeDiseases" class="styled-input" placeholder="e.g., Leaf Spot, Canker..." />
+        <div class="field-label">Diseases</div>
+      </div>
+      <div>
+        <input type="text" id="treeDamage" class="styled-input" placeholder="e.g., Wind, Lightning..." />
+        <div class="field-label">Damage Type</div>
+      </div>
+    </div>
+    <div style="margin-top: 12px;">
+      <textarea id="issueNotes" class="styled-input" placeholder="Describe issues in detail..."></textarea>
+      <div class="field-label">Issue Notes</div>
+    </div>
+
+    <!-- 🛠️ Recommendations -->
+    <h4 style="margin-top: 20px;">🛠️ Recommendations</h4>
+    <div class="field-row-3">
+      <div>
+        <input type="text" id="treeActions" class="styled-input" placeholder="e.g., Pruning, Fertilization..." />
+        <div class="field-label">Recommended Actions</div>
+      </div>
+      <div>
+        <select id="actionPriority" class="styled-input">
+          <option value="">Select</option>
+          <option>Low</option>
+          <option>Medium</option>
+          <option>High</option>
+          <option>Emergency</option>
+        </select>
+        <div class="field-label">Priority Level</div>
+      </div>
+      <div>
+        <input type="text" id="followUpPerson" class="styled-input" placeholder="Person or team name..." />
+        <div class="field-label">Follow-up By</div>
+      </div>
+      <div>
+        <input type="date" id="nextActionDate" class="styled-input" />
+        <div class="field-label">Next Action Date</div>
+      </div>
+    </div>
+    <div style="margin-top: 12px;">
+      <textarea id="followUpNotes" class="styled-input" placeholder="Any follow-up notes..."></textarea>
+      <div class="field-label">Follow-up Notes</div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- SECTION: ✍️ Notes (Collapsible) -->
+<div class="modal-section">
+  <button class="collapsible-header collapsed" type="button" onclick="toggleCollapse(this)">
+    ✍️ Notes
+  </button>
+  <div class="collapsible-content" style="display: none;">
+    <textarea id="userNotes" class="styled-input" placeholder="Any notes about this tree..."></textarea>
+    <div class="field-label">Notes</div>
+  </div>
+</div>
+
+
+
+<!-- SECTION: 🔒 Anchored Save Button Footer -->
+<div class="modal-footer-bar">
+  <button id="copyLastTreeBtn" class="groundzy-btn" style="flex: 1;">⏱️ Copy Last Tree</button>
+  <button id="saveTreeBtn" class="groundzy-btn" style="flex: 1;">💾 Save</button>
+</div>
+
+
+</div>
+
+</div>
+
+  
+  
+  
+  
+  
+  
+  
+
+  
+  
+  
+<!-- SECTION: 👁️ View Tree Modal -->
+<div id="viewTreeModal" class="modal hidden">
+  <div class="modal-content view-tree-modal">
+    
+ <!-- ✏️ Add a minimize button next to close -->
+<div style="display: flex; gap: 8px; justify-content: flex-end;">
+  <div class="modal-header-buttons">
+    <button class="minimize-button" onclick="minimizeViewTreeModal()">🗕</button>
+    <button class="modal-close-button" onclick="closeModal(this)">×</button>
+  </div>  
+</div>
+
+
+
+
+    <!-- 🌳 Top Header -->
+    <div class="view-header">
+      <img id="viewTreeProfileImage" class="view-photo" src="https://gzadmin-93.github.io/tree-icons/icon_undefined.svg" alt="Tree Icon" />
+
+
+      <div class="view-header-details">
+        <h2 id="viewTreeSpeciesNameText">Amur Maple</h2>
+        <p class="tree-type-label">
+          <span id="viewTreeTypeText">Tree</span> —
+          <span id="viewTreeTINText">GZ-123-ABC</span>
+        </p>
+        <div id="viewTreeUpdatedAt" class="updated-time">Last Updated: --</div>
+      </div>
+    </div>
+
+    <!-- 🌿 Scientific Info -->
+    <div class="view-scientific-info">
+      <div><strong id="viewTreeGenusText">Acer</strong><br><span class="sub-label">Genus</span></div>
+      <div><strong id="viewTreeSpeciesText">ginnala</strong><br><span class="sub-label">Species</span></div>
+      <div><strong id="viewTreeFamilyText">Sapindaceae</strong><br><span class="sub-label">Family</span></div>
+    </div>
+
+      <!-- 📸 Uploaded Tree Photo (optional) -->
+<div id="viewTreePhotoBox" style="margin-top: 10px; display: none;">
+  <img id="viewTreePhoto" src="" alt="Tree Photo" style="width: 100%; max-height: 220px; object-fit: cover; border-radius: 12px;" />
+</div>
+    
+    
+ <!-- 🌿 Alternate Common Names -->
+<div id="viewTreeAlternateNamesBox" style="display: none; margin-top: 16px;">
+  <div class="field-value" id="viewTreeAlternateNamesText">None</div>
+  <div class="field-label">Alternate Common Names</div>
+</div>
+
+    
+    <!-- 🌱 Groundzy Notes -->
+
+     <div id="viewSpeciesInfoBox" class="species-notes-box">
+      <strong>Groundzy Notes:</strong>
+      <p id="viewSpeciesInfoText"></p>
+      </div>
+
+    
+<!-- SECTION: 📏 Age & Structure -->
+<div class="modal-section">
+  <h3 class="section-header">📏 Age & Structure</h3>
+  <div class="field-row-3">
+    <div>
+      <div class="field-value" id="viewTreeAgeText">--</div>
+      <div class="field-label">Estimated Age</div>
+    </div>
+    <div>
+      <div class="field-value" id="viewTreeHeightText">--</div>
+      <div class="field-label">Height</div>
+    </div>
+    <div>
+      <div class="field-value" id="viewTreeDBHText">--</div>
+      <div class="field-label">Trunk Diameter</div>
+    </div>
+    <div>
+      <div class="field-value" id="viewTreeCanopyText">--</div>
+      <div class="field-label">Canopy</div>
+    </div>
+  </div>
+</div>
+
+    <!-- SECTION: ❤️ Health & Condition -->
+<div class="modal-section">
+  <h3 class="section-header">❤️ Health & Condition</h3>
+  <div class="field-row-3">
+    <div>
+      <div class="field-value" id="viewTreeHealthText">--</div>
+      <div class="field-label">Overall Health</div>
+    </div>
+    <div>
+      <div class="field-value" id="viewTreeStructureText">--</div>
+      <div class="field-label">Structure</div>
+    </div>
+    <div>
+      <div class="field-value" id="viewTreeLeafConditionText">--</div>
+      <div class="field-label">Leaf Condition</div>
+    </div>
+    <div>
+      <div class="field-value" id="viewLastInspectedText">--</div>
+      <div class="field-label">Last Inspected</div>
+    </div>
+    <div>
+      <div class="field-value" id="viewNextInspectionText">--</div>
+      <div class="field-label">Next Inspection</div>
+    </div>
+  </div>
+</div>
+
+  <!-- SECTION: 🏷️ Tag & Location (Collapsible) -->
+<div class="modal-section">
+  <button id="viewTreeTagTitle" class="collapsible-header collapsed" type="button" onclick="toggleCollapse(this)">
+    🏷️ Tag & Location
+  </button>
+  
+<div class="collapsible-content" style="display: none;">
+
+    <div class="field-row-3">
+      <div>
+        <div class="field-value" id="viewTreeTagCodeText">--</div>
+        <div class="field-label">Tag Code</div>
+      </div>
+      <div>
+  <div class="field-value" id="viewTreeLatitudeText">--</div>
+  <div class="field-label">Latitude</div>
+</div>
+<div>
+  <div class="field-value" id="viewTreeLongitudeText">--</div>
+  <div class="field-label">Longitude</div>
+</div>
+
+      <div>
+        <div class="field-value" id="viewTreeAddressText">--</div>
+        <div class="field-label">Address</div>
+      </div>
+    </div>
+    <div style="margin-top: 12px;">
+      <div class="field-label">Location Notes</div>
+      <div class="field-value" id="viewTreeLocationNotesText">--</div>
+    </div>
+  </div>
+</div>
+  
+    <!-- SECTION: 🌍 Origin & Function (Collapsible) -->
+<div class="modal-section">
+  <button id="viewTreeOriginTitle" class="collapsible-header collapsed" type="button" onclick="toggleCollapse(this)">
+    🌍 Origin & Function
+  </button>
+  
+  <div class="collapsible-content" style="display: none;">
+    <div class="field-row-3">
+      <div>
+        <div class="field-value" id="viewTreeOriginStatusText">--</div>
+        <div class="field-label">Origin Status</div>
+      </div>
+      <div>
+        <div class="field-value" id="viewTreeUSDAZoneText">--</div>
+        <div class="field-label">USDA Zone</div>
+      </div>
+      <div>
+        <div class="field-value" id="viewTreeGrowthHabitText">--</div>
+        <div class="field-label">Growth Habit</div>
+      </div>
+      <div>
+        <div class="field-value" id="viewTreeLifespanText">--</div>
+        <div class="field-label">Lifespan Category</div>
+      </div>
+      <div>
+        <div class="field-value" id="viewTreeEcosystemRoleText">--</div>
+        <div class="field-label">Ecosystem Role</div>
+      </div>
+    </div>
+    <div style="margin-top: 12px;">
+      <div class="field-label">Use Categories</div>
+      <div class="field-value" id="viewTreeUseCategoriesText">--</div>
+    </div>
+  </div>
+</div>
+
+    
+ <!-- SECTION: 🚨 Issues & Recommendations (Collapsible) -->
+<div class="modal-section">
+  <button id="viewTreeIssuesTitle" class="collapsible-header collapsed" type="button" onclick="toggleCollapse(this)">
+    🚨 Issues & Recommendations
+  </button>
+  
+  <div class="collapsible-content" style="display: none;">
+    
+    <!-- 🐛 Issues Observed -->
+    <h4 style="margin-top: 0;">🐛 Issues Observed</h4>
+    <div class="field-row-3">
+      <div>
+        <div class="field-value" id="viewTreePestsText">--</div>
+        <div class="field-label">Pests</div>
+      </div>
+      <div>
+        <div class="field-value" id="viewTreeDiseasesText">--</div>
+        <div class="field-label">Diseases</div>
+      </div>
+      <div>
+        <div class="field-value" id="viewTreeDamageText">--</div>
+        <div class="field-label">Damage Type</div>
+      </div>
+    </div>
+    <div style="margin-top: 12px;">
+      <div class="field-label">Issue Notes</div>
+      <div class="field-value" id="viewIssueNotesText">--</div>
+    </div>
+
+    <!-- 🛠️ Recommendations -->
+    <h4 style="margin-top: 20px;">🛠️ Recommendations</h4>
+    <div class="field-row-3">
+      <div>
+        <div class="field-value" id="viewTreeActionsText">--</div>
+        <div class="field-label">Recommended Actions</div>
+      </div>
+      <div>
+        <div class="field-value" id="viewActionPriorityText">--</div>
+        <div class="field-label">Priority Level</div>
+      </div>
+      <div>
+        <div class="field-value" id="viewFollowUpPersonText">--</div>
+        <div class="field-label">Follow-up By</div>
+      </div>
+      <div>
+        <div class="field-value" id="viewNextActionDateText">--</div>
+        <div class="field-label">Next Action Date</div>
+      </div>
+    </div>
+    <div style="margin-top: 12px;">
+      <div class="field-label">Follow-Up Notes</div>
+      <div class="field-value" id="viewFollowUpNotesText">--</div>
+    </div>
+
+  </div>
+</div>
+   
+    
+    
+ <!-- SECTION: ✍️ Notes (Collapsible) -->
+<div class="modal-section">
+  <button id="viewTreeNotesTitle" class="collapsible-header collapsed" type="button" onclick="toggleCollapse(this)">
+    ✍️ Notes
+  </button>
+  
+  <div class="collapsible-content" style="display: none;">
+    <div class="field-value" id="viewUserNotesText" style="white-space: pre-wrap;">--</div>
+    <div class="field-label">General Notes</div>
+  </div>
+</div>
+
+ 
+    
+    <!-- SECTION: ✏️ Edit & Delete Buttons -->
+<div class="modal-actions">
+  <button id="goToEditModeBtn" class="groundzy-btn">Go into Edit Mode</button>
+  <button id="deleteTreeBtn" class="red-btn">Delete Tree</button>
+</div>
+
+
+  </div>
+</div>
+
+
+  <!-- SECTION: 📢 Notifications Modal -->
+  <div id="notificationsModal" class="modal hidden">
+    <div class="modal-content">
+      <button class="modal-close-button" onclick="closeModal(this)">×</button>
+      <h2>Notifications Center</h2>
+
+      <div style="margin-top: 10px;">
+        <h4>📢 System Updates</h4>
+        <p>Loading update notes...</p>
+      </div>
+      
+
+
+      <div style="margin-top: 10px;">
+        <h4>🌳 Tree Sharing Requests</h4>
+        <p>No new requests.</p>
+      </div>
+
+      <div style="margin-top: 10px;">
+        <h4>⚠️ Warnings</h4>
+        <p>No active warnings.</p>
+      </div>
+
+      <div style="margin-top: 10px;">
+        <h4>💬 Messages</h4>
+        <p>No new messages.</p>
+      </div>
+
+      <div class="modal-actions">
+      
+      </div>
+    </div>
+  </div>
+  
+  
+<!-- SECTION: 🔍 Tree Identifier Modal -->
+<div id="treeIdentifierModal" class="modal hidden">
+  <div class="modal-content">
+    <button class="modal-close-button" onclick="closeModal(this)">×</button>
+   <div style="text-align: center; margin-bottom: 6px;">
+  <div style="font-size: 1.8em;">🪄🌳</div>
+  <h2 style="margin: 4px 0 0;">Tree Identifier Wizard</h2>
+</div>
+
+  Groundzy combines AI and expert-verified plant databases to help you identify species in seconds.
+  <br><br>
+  <strong style="color: #b94a48;">⚠️ Tip:</strong> For best results, upload close, clear photos of the <em>same tree</em> — leaf, bark, or fruit.
+</p>
+
+    <div id="photoInputContainer">
+      <!-- Photo block will go here -->
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px;">
+      <button onclick="addPhotoBlock()" class="groundzy-btn" style="background-color: #eef4f0; color: #1a3e3c; flex: 1;">
+        Add More Photos
+      </button>
+
+      <button id="submitIdentifierBtn" class="groundzy-btn" style="flex: 1;">
+        🌳 Identify Tree
+      </button>
+    </div>
+
+    <div id="identifierPreview" style="margin-top: 12px; display: none;">
+      <p><strong>Preview:</strong></p>
+      <img id="identifierPreviewImg" style="max-width: 100%; border-radius: 12px;" />
+    </div>
+  </div>
+</div>
+
+  
+  
+  
+  
+
+  <!-- SECTION: 🔐 Request Access Modal -->
+  <div id="requestAccessModal" class="modal hidden" onclick="closeRequestAccessModal(event)">
+    <div class="modal-content" style="position: relative;" onclick="event.stopPropagation();">
+      <button class="modal-close-button" onclick="closeModal(this)">×</button>
+      <h2>Restricted Tree</h2>
+      <p>This tree is part of another user's database.</p>
+      <p><strong>Tree Code:</strong> <span id="nonUserGZCode">GZ-XXXX-XXXX</span></p>
+      <button class="groundzy-btn" style="margin-top: 16px;" onclick="handleRequestAccessClick()">Request Access</button>
+    </div>
+  </div>
+
+  <!-- SECTION: 💬 Feedback Modal -->
+  <div id="feedback-modal" class="modal hidden">
+    <div class="modal-content">
+      <button class="modal-close-button" onclick="closeModal(this)">×</button>
+      <h2>💬 Send Feedback or Report an Issue</h2>
+      <p>This will send an email to <strong>info@groundzy.com</strong> using Formspree.</p>
+
+      <form id="feedback-form" action="https://formspree.io/f/xblownyl" method="POST">
+        <input type="hidden" name="User ID" id="user-id" readonly>
+        <input type="hidden" name="Name" id="user-name" readonly>
+        <input type="hidden" name="Email" id="user-email" readonly>
+        <input type="hidden" name="Timestamp" id="timestamp" readonly>
+
+        <label for="message">Your Message:</label>
+        <textarea name="message" id="message" placeholder="Describe your feedback or issue here..." required></textarea>
+
+        <button type="submit" class="groundzy-btn">Send Feedback</button>
+      </form>
+    </div>
+  </div>
+
+
+ <!-- SECTION: 🖼️ Simulated Fullscreen Tree Photo Viewer -->
+<div id="fullscreenPhotoWrapper" style="
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+">
+  <img id="fullscreenTreePhoto" src="" alt="Fullscreen Tree Photo" style="
+    max-width: 100vw;
+    max-height: 100vh;
+    object-fit: contain;
+  " />
+  <button onclick="closeFullscreenPhoto()" style="
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    font-size: 28px;
+    background: none;
+    border: none;
+    color: white;
+    z-index: 10000;
+    cursor: pointer;
+  ">×</button>
+</div>
+
+
+
+  <!-- SECTION: 🖱️ Marker Adjustment Message -->
+  <div id="adjustMarkerMessage" style="
+    display: none;
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #253d38;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    z-index: 2000;
+    text-align: center;
+  ">
+    🖱️ Adjust marker by dragging to new location
+  </div>
+
+  
+  <!-- SECTION: 🌳 Loading Spinner -->
+<div id="mapLoadingOverlay" style="
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(241, 245, 245, 0.95); /* antiflash white with slight opacity */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+  font-family: 'Segoe UI', sans-serif;
+  color: #1a3e3c;
+  font-size: 1.1em;
+  font-weight: bold;
+">
+  <div style="
+    background-color: #b3e878; /* light pistachio */
+    border-radius: 24px;
+    padding: 20px 30px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  ">
+    <img id="loadingTreeIcon" src="https://gzadmin-93.github.io/tree-icons/icon-117.svg" style="
+      width: 50px;
+      height: 50px;
+      animation: spin 2s linear infinite;
+    " />
+    <div>Loading Groundzy... </div>
+  </div>
+</div>
+
+<!-- Add this animation to your CSS later -->
+<style>
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+#mapLoadingOverlay {
+  transition: opacity 0.5s ease;
+}
+</style>
+
+<!-- 🎉 Confetti Library -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<!-- SECTION: 🗂️ Minimized View Modals (desktop only) -->
+<div id="minimizedModalBar" class="hidden minimized-bar"></div>
+
+
+    <!-- SECTION: 🧠 Dashboard Logic -->
+    <script type="module" src="dashboard.js"></script>
+  
+  
+  <!-- SECTION: Tutorial Logic -->
+  <script src="tutorial.js"></script>
+
+  <!-- SECTION: 🔧 Global initMap placeholder -->
+  <script>
+    // Define initMap immediately so Google Maps can find it
+    window.initMap = function() {
+      console.log('⏳ initMap placeholder called - waiting for module to load...');
+      
+      // Wait for the module to load and define the real initMap
+      const checkForRealInitMap = setInterval(() => {
+        if (window.realInitMap) {
+          clearInterval(checkForRealInitMap);
+          console.log('🚀 Calling real initMap from module');
+          window.realInitMap();
+        }
+      }, 100);
+    };
+  </script>
+
+  <!-- SECTION: 🌍 Google Maps JS (callback initMap) -->
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCGCgjRdDecwdBZVai_SI-vtufFoZIMiGM&callback=initMap&libraries=places"
+  ></script>
+</body>
+</html>
+
+

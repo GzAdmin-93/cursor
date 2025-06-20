@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Groundzy Admin Panel</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="https://gzadmin-93.github.io/tree-icons/favecon-02.svg"
+    />
+    <style>
+      body {
+        padding: 40px;
+        background: #193e3c;
+        color: white;
+        font-family: sans-serif;
+        display: none; /* 🛑 Hide until auth passes */
+      }
+      .visible {
+        display: block;
+      }
+      h1 {
+        color: #b3e878;
+      }
+      label {
+        display: block;
+        margin-top: 20px;
+        font-weight: bold;
+      }
+      input,
+      textarea {
+        width: 100%;
+        padding: 10px;
+        margin-top: 8px;
+        border-radius: 8px;
+        border: none;
+        font-size: 1em;
+      }
+      textarea {
+        min-height: 120px;
+      }
+      button {
+        margin-top: 20px;
+        background: #5bb543;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: bold;
+        color: white;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🛠️ Groundzy Admin Panel</h1>
+
+    <!-- SECTION: 🔘 Admin Navigation -->
+    <div style="margin-bottom: 20px">
+      <button onclick="goToDashboard()">📊 Go to Dashboard</button>
+      <button onclick="adminSignOut()">🔓 Sign Out</button>
+    </div>
+
+    <label for="adminVersion">Version</label>
+    <input id="adminVersion" placeholder="e.g., 1.6.1" />
+
+    <label for="adminChangelog">Changelog</label>
+    <textarea
+      id="adminChangelog"
+      placeholder="Enter update notes..."
+    ></textarea>
+
+    <button onclick="saveAdminSettings()">💾 Save Changes</button>
+
+    <div id="versionLog" style="margin-top: 40px"></div>
+
+    <!-- SECTION: 🌳 Tree Search Tool -->
+    <div style="margin-top: 60px">
+      <h2>🌳 Tree Search</h2>
+      <input
+        type="text"
+        id="treeSearchInput"
+        placeholder="Search by species or type..."
+        style="padding: 8px; width: 100%; max-width: 300px; margin-bottom: 10px"
+      />
+      <button onclick="loadAllTrees()">🔍 Load Trees</button>
+      <div id="treeResults" style="margin-top: 20px"></div>
+    </div>
+
+    <!-- SECTION: 🌱 Species Catalog Manager -->
+    <div style="margin-top: 60px">
+      <h2>🌱 Species Catalog Manager</h2>
+      <p>
+        Paste rows from Excel (tab-separated). Each row should match the
+        following order:
+      </p>
+      <code
+        >commonName, iconNumber, scientificName, genus, species, family,
+        alternateNames, native, deciduous, hardinessZone, growthHabit, notes,
+        lifeSpan</code
+      >
+
+      <textarea
+        id="catalogPasteBox"
+        placeholder="Paste rows here..."
+        style="width: 100%; min-height: 120px; margin-top: 10px"
+      ></textarea>
+
+      <button onclick="previewCatalogEntries()">🔍 Preview Entries</button>
+      <button onclick="uploadCatalogToFirestore()">
+        💾 Upload to Firestore
+      </button>
+
+      <div id="catalogPreviewBox" style="margin-top: 20px"></div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <script>
+      // SECTION: 🔥 Firebase Config
+      const firebaseConfig = {
+        apiKey: "AIzaSyCGCgjRdDecwdBZVai_SI-vtufFoZIMiGM",
+        authDomain: "groundzy-live.firebaseapp.com",
+        projectId: "groundzy-live",
+      };
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+
+      // SECTION: 🔒 Auth Protection (admin by UID)
+      const allowedAdminUID = "ldoDleLEpWWhYWgB3QUwQrGlTOG2";
+
+      firebase.auth().onAuthStateChanged((user) => {
+        if (!user) {
+          alert("Please log in first.");
+          window.location.href = "/";
+          return;
+        }
+
+        console.log("✅ Logged in as UID:", user.uid);
+
+        if (user.uid !== allowedAdminUID) {
+          alert("Access denied. You are not an admin.");
+          window.location.href = "/";
+          return;
+        }
+
+        document.body.classList.add("visible");
+        loadSettings();
+      });
+
+      // SECTION: 🔄 Load Settings and History
+      function loadSettings() {
+        // Load current version & changelog
+        db.collection("settings")
+          .doc("global")
+          .get()
+          .then((doc) => {
+            if (doc.exists) {
+              const data = doc.data();
+              document.getElementById("adminVersion").value =
+                data.version || "";
+              document.getElementById("adminChangelog").value =
+                data.changelog || "";
+            }
+          });
+
+        // Load version history (new array format)
+        db.collection("settings")
+          .doc("history")
+          .get()
+          .then((doc) => {
+            const logBox = document.getElementById("versionLog");
+            if (!doc.exists || !logBox) return;
+
+            const entries = doc.data().entries || [];
+            logBox.innerHTML = "<h3>🕘 Update History</h3>";
+
+            entries.forEach((entry) => {
+              const version = entry.version || "❓ Unknown";
+              const changelog = entry.changelog || "❓ No changelog";
+              const date = entry.timestamp
+                ? new Date(entry.timestamp).toLocaleString()
+                : "--";
+
+              logBox.innerHTML += `
+      <div style="margin-bottom: 16px; border-bottom: 1px solid #444; padding-bottom: 12px;">
+        <strong>Version ${version}</strong><br />
+        <small>${date}</small><br />
+        <pre style="white-space: pre-wrap; color: #ccc;">${changelog}</pre>
+      </div>
+    `;
+            });
+          });
+      }
+
+      // SECTION: 💾 Save Settings + History
+      function saveAdminSettings() {
+        const version = document.getElementById("adminVersion").value.trim();
+        const changelog = document
+          .getElementById("adminChangelog")
+          .value.trim();
+
+        if (!version || !changelog) {
+          alert("Please enter both version and changelog.");
+          return;
+        }
+
+        const now = new Date().toISOString();
+
+        // 1. Save latest version to 'global'
+        db.collection("settings").doc("global").set(
+          {
+            version,
+            changelog,
+            updatedAt: now,
+          },
+          { merge: true }
+        );
+
+        // 2. Append to a list instead of a nested map
+        const historyRef = db.collection("settings").doc("history");
+
+        historyRef
+          .get()
+          .then((doc) => {
+            const oldEntries =
+              doc.exists && Array.isArray(doc.data().entries)
+                ? doc.data().entries
+                : [];
+            const updatedEntries = [
+              { version, changelog, timestamp: now },
+              ...oldEntries,
+            ];
+            return historyRef.set({ entries: updatedEntries });
+          })
+          .then(() => {
+            alert("✅ Settings updated!");
+            loadSettings();
+          })
+          .catch((err) => {
+            alert("❌ Failed to save: " + err.message);
+          });
+      }
+
+      // SECTION: 🔘 Admin Page Navigation Buttons
+      function goToDashboard() {
+        window.location.href = "/dashboard";
+      }
+
+      function adminSignOut() {
+        firebase
+          .auth()
+          .signOut()
+          .then(() => {
+            window.location.href = "/";
+          });
+      }
+
+      // SECTION: 🌳 Load and Display All Trees
+      function loadAllTrees() {
+        const query = document
+          .getElementById("treeSearchInput")
+          .value.trim()
+          .toLowerCase();
+        const resultsBox = document.getElementById("treeResults");
+        resultsBox.innerHTML = "Loading trees...";
+
+        firebase
+          .firestore()
+          .collection("map_items")
+          .get()
+          .then((snapshot) => {
+            const trees = [];
+            snapshot.forEach((doc) => {
+              const data = doc.data();
+              const match =
+                !query ||
+                (data.commonName &&
+                  data.commonName.toLowerCase().includes(query)) ||
+                (data.type && data.type.toLowerCase().includes(query)) ||
+                (data.address && data.address.toLowerCase().includes(query)) ||
+                (data.tin && data.tin.toLowerCase().includes(query)) ||
+                (data.health && data.health.toLowerCase().includes(query)) ||
+                (data.tagCode && data.tagCode.toLowerCase().includes(query));
+
+              if (match && !data.isDeleted) trees.push({ id: doc.id, ...data });
+            });
+
+            if (trees.length === 0) {
+              resultsBox.innerHTML = "No matching trees found.";
+              return;
+            }
+
+            resultsBox.innerHTML = trees
+              .map(
+                (tree, index) => `
+    <div style="padding: 12px; border-bottom: 1px solid #444;">
+      <div style="cursor: pointer;" onclick="toggleTreeDetails(${index})">
+        <strong>${tree.commonName || "Unknown"}</strong> (${
+                  tree.type || "Unknown"
+                })<br />
+        <small><strong>TIN:</strong> ${tree.tin || "--"}</small>
+        <span style="color: #88bd4a;">+ info</span>
+      </div>
+
+      <div id="treeDetails-${index}" style="display: none; margin-top: 10px;">
+        <small><strong>ID:</strong> ${tree.id}</small><br />
+        <small><strong>Tag Code:</strong> ${tree.tagCode || "--"}</small><br />
+        <small><strong>Health:</strong> ${tree.health || "N/A"}</small><br />
+        <small><strong>Structure:</strong> ${
+          tree.structure || "N/A"
+        }</small><br />
+        <small><strong>Actions:</strong> ${tree.actions || "None"}</small><br />
+        <small><strong>Last Inspected:</strong> ${
+          tree.lastInspected || "--"
+        }</small><br />
+        <small><strong>Next Inspection:</strong> ${
+          tree.nextInspection || "--"
+        }</small><br />
+        <small><strong>Address:</strong> ${tree.address || "--"}</small><br />
+        <small><strong>Lat / Lng:</strong> ${tree.lat?.toFixed(6) || "--"}, ${
+                  tree.lng?.toFixed(6) || "--"
+                }</small>
+                <button onclick="viewInDashboard('${tree.id}', ${tree.lat}, ${
+                  tree.lng
+                })" style="margin-top: 10px;">
+  📍 View in Dashboard
+</button>
+
+      </div>
+    </div>
+  `
+              )
+              .join("");
+          });
+      }
+
+      // SECTION: 🔽 Toggle Tree Detail View
+      function toggleTreeDetails(index) {
+        const box = document.getElementById(`treeDetails-${index}`);
+        if (box) {
+          box.style.display = box.style.display === "none" ? "block" : "none";
+        }
+      }
+
+      // SECTION: 📍 Jump to Tree in Dashboard
+      function viewInDashboard(treeId, lat, lng) {
+        // Save data in localStorage
+        localStorage.setItem("jumpToTreeLat", lat);
+        localStorage.setItem("jumpToTreeLng", lng);
+        localStorage.setItem("jumpToTreeId", treeId);
+        window.location.href = "/dashboard.html";
+      }
+
+      function previewCatalogEntries() {
+        const raw = document.getElementById("catalogPasteBox").value.trim();
+        const rows = raw.split("\n");
+        const previewBox = document.getElementById("catalogPreviewBox");
+        previewBox.innerHTML = "";
+
+        rows.forEach((line, i) => {
+          const cols = line.split("\t");
+          if (cols.length < 13) {
+            previewBox.innerHTML += `<div style="color: red;">Row ${
+              i + 1
+            } has missing fields</div>`;
+            return;
+          }
+
+          previewBox.innerHTML += `
+      <div style="margin-bottom: 8px; border-bottom: 1px solid #555; padding-bottom: 6px;">
+        <strong>${cols[0]}</strong> (${cols[2]}) — Icon: icon-${cols[1]}.svg
+        <br><small>Deciduous: ${cols[8]}, Native: ${cols[7]}</small>
+        <br><small>${cols[11]}</small>
+      </div>
+    `;
+        });
+      }
+
+      function uploadCatalogToFirestore() {
+        const raw = document.getElementById("catalogPasteBox").value.trim();
+        const rows = raw.split("\n");
+        const db = firebase.firestore();
+
+        rows.forEach((line) => {
+          const [
+            commonName,
+            iconNumber,
+            scientificName,
+            genus,
+            species,
+            family,
+            alternateNames,
+            native,
+            deciduous,
+            hardinessZone,
+            growthHabit,
+            notes,
+            lifeSpan,
+          ] = line.split("\t");
+
+          if (!commonName || !iconNumber) return; // skip if required fields are missing
+
+          const doc = {
+            commonName,
+            icon: `icon-${iconNumber}.svg`,
+            scientificName,
+            genus,
+            species,
+            family,
+            alternateNames,
+            native: native === "TRUE",
+            deciduous: deciduous === "TRUE",
+            hardinessZone,
+            growthHabit,
+            notes,
+            lifeSpan,
+            updatedAt: new Date().toISOString(),
+          };
+
+          db.collection("catalog_items")
+            .add(doc)
+            .then(() => {
+              console.log("✅ Added:", commonName);
+            })
+            .catch((err) => {
+              console.error("❌ Error adding:", commonName, err);
+            });
+        });
+
+        alert("✅ Upload complete!");
+      }
+    </script>
+  </body>
+</html>

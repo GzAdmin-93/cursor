@@ -1,0 +1,236 @@
+/* ============================
+   🌍 GLOBAL LAYOUT + DEFAULTS
+============================ */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: auto;
+  min-height: 100vh;
+  background-color: #193e3c;
+  font-family: sans-serif;
+  overflow-y: auto;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+/* ============================
+   📦 CONTAINER WRAPPER
+============================ */
+.container {
+  text-align: center;
+  width: 90%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px 0;
+  color: white;
+}
+
+/* SECTION: 🧪 Beta Version */
+.groundzy-version {
+  font-size: 0.75rem;
+  color: #88bd4aff;
+  font-family: "Press Start 2P", monospace;
+  letter-spacing: 1px;
+}
+
+/* ============================
+   🖼️ LOGO
+============================ */
+.logo {
+  width: 150px;
+  margin-bottom: 15px;
+}
+
+/* ============================
+   ✏️ INPUT FIELDS
+============================ */
+.input {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 8px;
+  font-style: italic;
+  font-size: 1em;
+}
+
+/* ============================
+   🔘 BUTTONS
+============================ */
+button {
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  color: white;
+  margin: 5px 0;
+  width: 100%;
+}
+
+.login {
+  background-color: #0b6b3e;
+}
+
+.register {
+  background-color: #5bb543;
+}
+
+.btn-lime {
+  background-color: #5bb543;
+  color: white;
+  font-weight: bold;
+}
+
+/* ============================
+   ↔️ BUTTON ROW (Login/Register)
+============================ */
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* ============================
+   🔗 LINKS
+============================ */
+.link {
+  margin-top: 15px;
+  color: #ccc;
+  font-size: 0.9em;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.underline a {
+  text-decoration: underline;
+}
+
+/* ============================
+   🙈 HIDDEN CLASS
+============================ */
+.hidden {
+  display: none;
+}
+
+/* ============================
+   ❌ CLOSE BUTTON
+============================ */
+.close-btn {
+  text-align: right;
+  font-size: 1.2em;
+  color: white;
+  cursor: pointer;
+  margin-top: -5px;
+  margin-bottom: 10px;
+}
+
+/* ============================
+   ☑️ CHECKBOXES
+============================ */
+.checkbox {
+  display: flex;
+  align-items: center;
+  text-align: left;
+  margin: 10px 0;
+  font-size: 0.95em;
+}
+
+.checkbox input {
+  margin-right: 8px;
+}
+
+/* ============================
+   📤 UPLOAD FILE FIELD
+============================ */
+.upload {
+  font-size: 0.9em;
+  margin: 10px 0;
+  text-align: left;
+}
+
+/* ============================
+   📝 FORM HEADINGS
+============================ */
+h3 {
+  font-size: 1.05em;
+  margin-top: 20px;
+  margin-bottom: 8px;
+  text-align: left;
+}
+
+/* ============================
+   🌍 SCROLLABLE WRAPPER (Optional Use)
+============================ */
+.scroll-wrapper {
+  height: 100vh;
+  overflow-y: auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* ============================
+   🌎 INTL TEL INPUT (Phone Selector)
+============================ */
+.iti {
+  width: 100%;
+}
+
+.iti__flag-container {
+  padding-right: 10px;
+}
+
+.iti__selected-flag {
+  background-color: #1a3e3c;
+  border-radius: 8px 0 0 8px;
+}
+
+.iti__country-list {
+  background-color: white;
+  color: black;
+  max-height: 200px;
+  overflow-y: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.iti input[type="tel"] {
+  background-color: white;
+  color: black;
+  font-style: normal;
+  padding-left: 50px;
+}
+
+.iti--allow-dropdown input {
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 1em;
+  border: none;
+  width: 100%;
+}
+
+/* ============================
+   🧩 ORG SEARCH RESULTS
+============================ */
+.search-results .org-result {
+  background: #2c3e50;
+  padding: 8px;
+  margin: 5px 0;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.search-results .org-result:hover {
+  background: #3d566e;
+}
