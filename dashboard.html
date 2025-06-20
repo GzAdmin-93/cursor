@@ -1018,6 +1018,16 @@
         }
       }, 100);
     };
+
+    // Fallback: Hide loading overlay after 10 seconds if initialization fails
+    setTimeout(() => {
+      const spinner = document.getElementById("mapLoadingOverlay");
+      if (spinner && spinner.style.display !== "none") {
+        console.warn('⚠️ Force hiding loading overlay after timeout');
+        spinner.style.display = "none";
+        alert('Dashboard took too long to load. Please refresh the page.');
+      }
+    }, 10000);
   </script>
 
   <!-- SECTION: 🌍 Google Maps JS (callback initMap) -->
