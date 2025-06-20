@@ -11,7 +11,7 @@ window.realInitMap = async function() {
     const { authManager } = await import('./modules/auth.js');
     const { mapManager } = await import('./modules/map.js');
     const { treeManager } = await import('./modules/tree.js');
-    const { firebase, db, storage } = await import('./config/firebase.js');
+    const { db, storage } = await import('./config/firebase.js');
 
     console.log('📦 Modules imported successfully');
 
@@ -36,7 +36,7 @@ window.realInitMap = async function() {
     console.log('🎯 Event listeners setup');
 
     console.log('✅ Dashboard initialized successfully');
-    } catch (error) {
+  } catch (error) {
     console.error('❌ Dashboard initialization failed:', error);
   }
 };

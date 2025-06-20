@@ -24,4 +24,5 @@ if (!firebase.apps.length) {
 const db = firebase.firestore();
 const storage = firebase.storage();
 
-export { firebase, db, storage }; 
+// Only export db and storage - firebase is available globally
+export { db, storage }; 

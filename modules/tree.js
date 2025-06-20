@@ -2,7 +2,7 @@
 // 🌳 TREE MANAGEMENT MODULE
 // ============================
 
-import { firebase, db, storage } from '../config/firebase.js';
+import { db, storage } from '../config/firebase.js';
 import { authManager } from './auth.js';
 import { mapManager } from './map.js';
 
