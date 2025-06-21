@@ -21,6 +21,19 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
+  <!-- Test script to check function availability -->
+  <script>
+    console.log('🔍 Page loading...');
+    console.log('🔍 openTreeModal available:', typeof openTreeModal);
+    console.log('🔍 window.openTreeModal available:', typeof window.openTreeModal);
+    
+    // Check again after a short delay
+    setTimeout(() => {
+      console.log('🔍 After delay - openTreeModal available:', typeof openTreeModal);
+      console.log('🔍 After delay - window.openTreeModal available:', typeof window.openTreeModal);
+    }, 1000);
+  </script>
+
   </head>
 <body>
 
@@ -29,7 +42,7 @@
     <div class="top-bar-inner">
       
       <!-- SECTION: 🌦️ Weather Box -->
-<div id="weatherBox" class="weather-box hidden">
+<div id="weatherBox" class="weather-box">
   <div style="display: flex; flex-direction: column;">
   <div style="display: flex; gap: 10px; align-items: center;">
     <div id="weatherTemp">--°</div>
@@ -129,6 +142,12 @@
 <a id="addButton" href="#">
       <img src="https://raw.githubusercontent.com/GzAdmin-93/GZ-Icons/refs/heads/main/bottomNav_add.svg" alt="Add" />
     </a>
+
+<!-- 🌳 Direct Add Tree Button -->
+<a href="#" id="addTreeDirectBtn" title="Quick Add Tree">
+  <img src="https://raw.githubusercontent.com/GzAdmin-93/GZ-Icons/refs/heads/main/bottomNav_add.svg" alt="Quick Add Tree" />
+</a>
+
     
     <!-- 📷 Screenshot Mode Toggle -->
 <a href="#" id="screenshotToggleBtn" title="Toggle Screenshot Mode">
@@ -141,18 +160,20 @@
     </a>
   </div>
 
-  <!-- SECTION: ➕ Add Submenu -->
-  <div id="submenu-add" class="submenu hidden">
-    <button class="groundzy-btn" onclick="openTreeModal()">Add Item</button>
-    <button class="groundzy-btn">Add Property</button>
-  </div>
-
-
   <!-- SECTION: 👤 Account Submenu -->
   <div id="submenu-account" class="submenu hidden">
     <button id="tutorial-button" class="groundzy-btn">🎓 View Tutorial</button>
     <button id="feedback-button" class="groundzy-btn">Feedback / Issues</button>
     <button class="red-btn" onclick="signOut()">Sign Out</button>
+  </div>
+
+  <!-- SECTION: ➕ Add Submenu -->
+  <div id="submenu-add" class="submenu hidden">
+    <button class="groundzy-btn" onclick="openTreeModal()">Add Item</button>
+    <button class="groundzy-btn">Add Property</button>
+    <button class="groundzy-btn" onclick="testTreeModal()">Test Tree Modal</button>
+    <button class="groundzy-btn" onclick="testModalDirectly()">Test Modal Directly</button>
+    <button class="groundzy-btn" onclick="console.log('Button clicked'); alert('Button works!');">Test Button</button>
   </div>
 
 
@@ -824,7 +845,7 @@
 
   Groundzy combines AI and expert-verified plant databases to help you identify species in seconds.
   <br><br>
-  <strong style="color: #b94a48;">⚠️ Tip:</strong> For best results, upload close, clear photos of the <em>same tree</em> — leaf, bark, or fruit.
+  <strong style="color: #b94a48;">⚠️ Tip:</strong> For best results, upload close, clear photos of the <em>same tree</em> and label each photo type (leaf, bark, flower, fruit, whole plant) for accurate identification.
 </p>
 
     <div id="photoInputContainer">
@@ -842,8 +863,7 @@
     </div>
 
     <div id="identifierPreview" style="margin-top: 12px; display: none;">
-      <p><strong>Preview:</strong></p>
-      <img id="identifierPreviewImg" style="max-width: 100%; border-radius: 12px;" />
+      <p><strong>Identification Results:</strong></p>
     </div>
   </div>
 </div>

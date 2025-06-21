@@ -10,6 +10,22 @@ function goToTutorialStep(stepNumber) {
   runTutorialStep();
 }
 
+// Global function to test step 7 directly
+window.testStep7 = function() {
+  console.log('🧪 Testing step 7 directly...');
+  window.tutorialStep = 7;
+  runTutorialStep();
+};
+
+// Global function to check current tutorial state
+window.checkTutorialState = function() {
+  console.log('🔍 Current tutorial state:');
+  console.log('- Tutorial step:', window.tutorialStep);
+  console.log('- Is in tutorial:', window.isInTutorial);
+  console.log('- All tree markers:', allTreeMarkers.length);
+  console.log('- Map manager available:', !!window.mapManager);
+};
+
 // ============================ 🟢 Step 0: Show Welcome Modal ============================
 function showTutorialWelcomeModal() {
   closeAllModals();
@@ -52,58 +68,79 @@ function skipGroundzyTutorial() {
 
 // ============================ 🔄 Tutorial Flow Controller ============================
 function runTutorialStep() {
+  console.log('🎯 Running tutorial step:', window.tutorialStep);
+  
   switch (window.tutorialStep) {
     case 2:
+      console.log('📋 Step 2: Dashboard Explanation');
       showDashboardExplanation();
       break;
     case 3:
+      console.log('🔍 Step 3: Highlight Search Button');
       highlightSearchButton();
       break;
     case 4:
+      console.log('🌲 Step 4: Sherman Found Prompt');
       showShermanFoundPrompt();
       break;
     case 5:
+      console.log('🌤️ Step 5: Highlight Weather Box');
       highlightWeatherBox();
       break;
     case 6:
+      console.log('🌳 Step 6: Highlight Tree Legend');
       highlightTreeLegend();
       break;
     case 7:
+      console.log('📍 Step 7: Show View Tree Modal Walkthrough');
       promptTapTreeMarker();
       break;
     case 8:
+      console.log('📖 Step 8: View Tree Intro Prompt');
       showViewTreeIntroPrompt();
       break;
     case 9:
+      console.log('🪄 Step 9: Wizard Intro Modal');
       showWizardIntroModal();
       break;
     case 10:
+      console.log('✈️ Step 10: Start Wizard Fly');
       startWizardFlyToLoneCypress();
       break;
     case 11:
+      console.log('🌲 Step 11: Lone Cypress Intro');
       showLoneCypressIntro();
       break;
     case 12:
+      console.log('🔍 Step 12: Highlight Identify Button');
       highlightIdentifyTreeButton();
       break;
     case 13:
+      console.log('📋 Step 13: Wizard Instructions');
       showWizardInstructions();
       break;
     case 14:
+      console.log('🪄 Step 14: Open Tutorial Wizard');
       openTutorialTreeWizard();
       break;
     case 15:
+      console.log('➕ Step 15: Add Identified Tree Prompt');
       showAddIdentifiedTreePrompt();
       break;
     case 16:
+      console.log('🌳 Step 16: Add Tree Modal');
       showStep16_AddTreeModal();
       break;
     case 17:
+      console.log('🏠 Step 17: Final Home Highlight');
       showFinalStep_HighlightHome();
       break;
     case 18:
+      console.log('🎉 Step 18: Final Confetti');
       showFinalConfettiStep();
       break;
+    default:
+      console.log('❌ Unknown tutorial step:', window.tutorialStep);
   }
 }
 
@@ -125,7 +162,7 @@ function showDashboardExplanation() {
     <div class="modal-content">
     <h2>🗺️ Welcome to the Dashboard</h2>
     <p>This is your interactive Groundzy map — where you can search, identify trees, and manage your entries.</p>
-    <p>We’ll guide you step-by-step through the tools you'll need.</p>    
+    <p>We'll guide you step-by-step through the tools you'll need.</p>    
       <div class="modal-actions">
       <button class="groundzy-btn" onclick="document.getElementById('tutorialDashboardBorder')?.remove(); nextTutorialStep()">Next</button>
       </div>
@@ -208,7 +245,7 @@ function highlightSearchButton() {
       enterPrompt.style.zIndex = "2000";
       enterPrompt.innerHTML = `
         ✅ Now tap the smaller search button to run the search for <strong>GZ-BHE5-TFCF</strong><br>
-        (That’s a real tree’s unique Groundzy Code!)
+        (That's a real tree's unique Groundzy Code!)
       `;
 
       document.body.appendChild(enterPrompt);
@@ -260,7 +297,7 @@ function showShermanFoundPrompt() {
       <h2>🎉 Found It!</h2>
       <p>You just searched for a real Groundzy Code: <strong>GZ-BHE5-TFCF</strong>.</p>
       <p>This points to the legendary <strong>General Sherman Tree</strong> — the largest known living tree on Earth! 🌲</p>
-      <p>Before we explore its details, let’s take a look at some helpful dashboard tools...</p>
+      <p>Before we explore its details, let's take a look at some helpful dashboard tools...</p>
       <div class="modal-actions">
         <button class="groundzy-btn" onclick="goToWeatherStep()">Next</button>
       </div>
@@ -404,15 +441,29 @@ function highlightTreeLegend() {
         prompt.style.top = `${rect.top - prompt.offsetHeight - 12}px`;
         prompt.style.left = `${rect.left + rect.width / 2 - 120}px`; // 120 = half of maxWidth
 
-        // Simulate a toggle on/off
+        // Simulate a toggle on/off with better error handling
         setTimeout(() => {
           prompt.style.display = "none";
-          screenshotBtn.click();
-          setTimeout(() => {
+          
+          // First click - enter screenshot mode
+          if (screenshotBtn) {
             screenshotBtn.click();
-            prompt.style.display = "block";
-            legendSubStep++;
-            runSubStep();
+            console.log('📸 Tutorial: Entered screenshot mode');
+          }
+          
+          setTimeout(() => {
+            // Second click - exit screenshot mode
+            if (screenshotBtn) {
+              screenshotBtn.click();
+              console.log('📸 Tutorial: Exited screenshot mode');
+            }
+            
+            // Show prompt again and continue
+            setTimeout(() => {
+              prompt.style.display = "block";
+              legendSubStep++;
+              runSubStep();
+            }, 1000);
           }, 3000);
         }, 3000);
         break;
@@ -429,50 +480,13 @@ function highlightTreeLegend() {
   runSubStep();
 }
 
-// ============================ 📍 Step 7: Prompt to Tap Tree Marker ============================
+// ============================ 📍 Step 7: Show View Tree Modal Walkthrough ============================
 function promptTapTreeMarker() {
-  const markerData = allTreeMarkers.find((m) => m.data.tin === "GZ-BHE5-TFCF");
-
-  if (!markerData) {
-    console.warn("Marker for General Sherman not found.");
-    return;
-  }
-
-  const marker = markerData.marker;
-  const latLng = marker.getPosition();
-
-  map.setCenter(latLng);
-  map.setZoom(20);
-
-  const glowCircle = new google.maps.Circle({
-    strokeColor: "#b9d88c",
-    strokeOpacity: 0.8,
-    strokeWeight: 2,
-    fillColor: "#88bd4a",
-    fillOpacity: 0.4,
-    map: map,
-    center: {
-      lat: latLng.lat() + 0.000015,
-      lng: latLng.lng(),
-    },
-    radius: 3,
-  });
-
-  let growing = true;
-  const pulse = setInterval(() => {
-    const current = glowCircle.getRadius();
-    glowCircle.setRadius(growing ? current + 1.5 : current - 1.5);
-    growing = !growing;
-  }, 500);
-
-  const stopGlow = () => {
-    glowCircle.setMap(null);
-    clearInterval(pulse);
-    document.getElementById("tutorialMarkerPrompt")?.remove();
-  };
-
+  console.log('🎯 Starting tutorial step 7: Show View Tree Modal Walkthrough');
+  
+  // Show explanation prompt first
   const prompt = document.createElement("div");
-  prompt.id = "tutorialMarkerPrompt";
+  prompt.id = "tutorialModalExplanation";
   prompt.style.position = "fixed";
   prompt.style.bottom = "120px";
   prompt.style.left = "50%";
@@ -484,30 +498,199 @@ function promptTapTreeMarker() {
   prompt.style.boxShadow = "0 4px 12px rgba(0,0,0,0.3)";
   prompt.style.zIndex = "2000";
   prompt.innerHTML = `
-    🌲 You’re looking at the <strong>General Sherman Tree</strong>, the largest living tree on Earth.<br><br>
-    🖱️ Tap the marker to explore its full details!
+    🌲 Now let's explore the <strong>General Sherman Tree</strong> details!<br><br>
+    We'll open the tree information modal to show you how to view tree data.<br><br>
+    <button class="groundzy-btn" onclick="openTutorialViewTreeModal()" style="margin-top: 8px;">Open</button>
   `;
 
   document.body.appendChild(prompt);
+}
 
-  marker.addListener("click", () => {
-    stopGlow();
+// Function to open the view tree modal for tutorial
+function openTutorialViewTreeModal() {
+  // Remove the explanation prompt
+  document.getElementById("tutorialModalExplanation")?.remove();
+  
+  // Open the view tree modal
+  const viewTreeModal = document.getElementById("viewTreeModal");
+  if (viewTreeModal) {
+    console.log('✅ View tree modal found, opening...');
+    viewTreeModal.classList.remove("hidden");
+    
+    // Populate the modal with General Sherman data
+    populateViewTreeModal();
+    
+    // Continue to tutorial step 8 after a short delay
     setTimeout(() => {
+      console.log('🔄 Proceeding to tutorial step 8...');
+      window.tutorialStep = 8;
+      runTutorialStep();
+    }, 1000);
+  } else {
+    console.warn("❌ View tree modal not found - creating fallback");
+    // Create a simple fallback modal
+    const fallbackModal = document.createElement("div");
+    fallbackModal.id = "viewTreeModal";
+    fallbackModal.className = "modal";
+    fallbackModal.innerHTML = `
+      <div class="modal-content">
+        <h2>🌲 General Sherman Tree</h2>
+        <p>This is the legendary General Sherman Tree - the largest known living tree on Earth!</p>
+        <p><strong>TIN:</strong> GZ-BHE5-TFCF</p>
+        <p><strong>Species:</strong> Giant Sequoia</p>
+        <p><strong>Location:</strong> Sequoia National Park, California</p>
+        <div class="modal-actions">
+          <button class="groundzy-btn" onclick="closeViewTreeAndStartWizard()">Continue Tutorial</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(fallbackModal);
+    
+    // Continue to tutorial step 8
+    setTimeout(() => {
+      console.log('🔄 Proceeding to tutorial step 8 with fallback modal...');
       window.tutorialStep = 8;
       runTutorialStep();
     }, 500);
+  }
+}
+
+// Populate the view tree modal with General Sherman data
+function populateViewTreeModal() {
+  // Set basic tree info
+  const elements = {
+    'viewTreeSpeciesNameText': 'Giant Sequoia',
+    'viewTreeTypeText': 'Tree',
+    'viewTreeTINText': 'GZ-BHE5-TFCF',
+    'viewTreeGenusText': 'Sequoiadendron',
+    'viewTreeSpeciesText': 'giganteum',
+    'viewTreeFamilyText': 'Cupressaceae',
+    'viewTreeAgeText': '2,200+ years',
+    'viewTreeHeightText': '275 feet (83.8 m)',
+    'viewTreeDBHText': '25.9 feet (7.9 m)',
+    'viewTreeCanopyText': '107 feet (32.6 m)',
+    'viewTreeHealthText': 'Excellent',
+    'viewTreeStructureText': 'Sound',
+    'viewTreeLeafConditionText': 'Healthy',
+    'viewTreeTagText': 'Sherman-001',
+    'viewTreeLocationText': '36.581644, -118.751418',
+    'viewTreeOriginText': 'Native to California',
+    'viewTreeFunctionText': 'Heritage tree, tourist attraction',
+    'viewTreeIssuesText': 'None currently',
+    'viewTreeRecommendationsText': 'Continue current maintenance program',
+    'viewTreeNotesText': 'The largest known living single-stem tree on Earth'
+  };
+
+  // Update each element
+  Object.entries(elements).forEach(([id, text]) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.textContent = text;
+    }
   });
+
+  // Set tree icon
+  const profileImg = document.getElementById("viewTreeProfileImage");
+  if (profileImg) {
+    profileImg.src = "https://gzadmin-93.github.io/tree-icons/icon-376.svg";
+  }
+
+  // Set tree photo
+  const photoBox = document.getElementById("viewTreePhotoBox");
+  const photoImg = document.getElementById("viewTreePhoto");
+  if (photoBox && photoImg) {
+    photoImg.src = "https://firebasestorage.googleapis.com/v0/b/groundzy-live.firebasestorage.app/o/tree_photos%2FMrTaFWcl9VQtrAhElyjTNqfFxgk1%2F1749683830225_General_Sherman_en_californie_a_s%C3%A9quoia_parc.jpg?alt=media&token=317913c5-be7f-41e2-86c0-9b363e183905";
+    photoBox.style.display = "block";
+    
+    // Add click functionality to enlarge photo
+    photoImg.style.cursor = "pointer";
+    photoImg.onclick = function() {
+      // Create photo enlargement modal
+      const photoModal = document.createElement("div");
+      photoModal.id = "photoEnlargementModal";
+      photoModal.style.position = "fixed";
+      photoModal.style.top = "0";
+      photoModal.style.left = "0";
+      photoModal.style.width = "100%";
+      photoModal.style.height = "100%";
+      photoModal.style.backgroundColor = "rgba(0,0,0,0.9)";
+      photoModal.style.zIndex = "3000";
+      photoModal.style.display = "flex";
+      photoModal.style.alignItems = "center";
+      photoModal.style.justifyContent = "center";
+      photoModal.style.cursor = "pointer";
+      
+      photoModal.innerHTML = `
+        <img src="${photoImg.src}" alt="Tree Photo" style="max-width: 90%; max-height: 90%; object-fit: contain; border-radius: 8px;" />
+        <div style="position: absolute; top: 20px; right: 20px; color: white; font-size: 24px; cursor: pointer; background: rgba(0,0,0,0.5); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">×</div>
+      `;
+      
+      document.body.appendChild(photoModal);
+      
+      // Close modal when clicked
+      photoModal.onclick = function() {
+        document.body.removeChild(photoModal);
+      };
+    };
+  }
+
+  // Set species info
+  const speciesInfoText = document.getElementById('viewSpeciesInfoText');
+  if (speciesInfoText) {
+    speciesInfoText.innerHTML = `
+      <strong>Giant Sequoia (Sequoiadendron giganteum)</strong><br><br>
+      The Giant Sequoia is one of the most massive living organisms on Earth. 
+      These trees can live for over 3,000 years and reach heights of over 300 feet. 
+      They are native to the western slopes of the Sierra Nevada mountains in California.<br><br>
+      <strong>Key Features:</strong><br>
+      • Massive trunk with thick, fire-resistant bark<br>
+        • Conical crown with scale-like leaves<br>
+        • Produces small cones that release seeds after fire<br>
+        • Excellent drought and fire resistance
+    `;
+  }
+
+  // Show the species info box
+  const speciesInfoBox = document.getElementById('viewSpeciesInfoBox');
+  if (speciesInfoBox) {
+    speciesInfoBox.style.display = 'block';
+  }
 }
 
 // ============================ 📖 Step 8: View Tree Modal Walkthrough ============================
 function showViewTreeIntroPrompt() {
+  console.log('🎯 Starting tutorial step 8: View Tree Modal Walkthrough');
+  
   const modal = document.getElementById("viewTreeModal");
   const modalContent = modal?.querySelector(".modal-content");
 
+  console.log('🔍 Modal found:', !!modal);
+  console.log('🔍 Modal hidden:', modal?.classList.contains("hidden"));
+  console.log('🔍 Modal content found:', !!modalContent);
+
   if (!modal || modal.classList.contains("hidden") || !modalContent) {
-    console.warn("❌ View Tree modal not open.");
+    console.warn("❌ View Tree modal not open or not found.");
+    console.log('🔍 Modal element:', modal);
+    console.log('🔍 Modal classes:', modal?.className);
+    
+    // Try to open the modal if it exists but is hidden
+    if (modal && modal.classList.contains("hidden")) {
+      console.log('🔄 Attempting to open hidden modal...');
+      modal.classList.remove("hidden");
+      setTimeout(() => {
+        showViewTreeIntroPrompt();
+      }, 100);
+      return;
+    }
+    
+    // If modal doesn't exist, skip this step
+    console.log('⏭️ Skipping step 8 - modal not available');
+    window.tutorialStep = 9;
+    runTutorialStep();
     return;
   }
+
+  console.log('✅ Modal is open and ready for walkthrough');
 
   const steps = [
     {
@@ -518,7 +701,7 @@ function showViewTreeIntroPrompt() {
     },
     {
       message:
-        "🆔 <strong>TIN & Icon:</strong><br>This is the tree’s unique code and icon.",
+        "🆔 <strong>TIN & Icon:</strong><br>This is the tree's unique code and icon.",
       selectors: ["#viewTreeTINText", "#viewTreeProfileImage"],
       insertAfter: "#viewTreeTINText",
     },
@@ -560,7 +743,7 @@ function showViewTreeIntroPrompt() {
     },
     {
       message:
-        "🏷️ <strong>Tag & Location:</strong><br>Shows the tree’s tag number and precise coordinates.",
+        "🏷️ <strong>Tag & Location:</strong><br>Shows the tree's tag number and precise coordinates.",
       selectors: [
         "#viewTreeTagTitle",
         "#viewTreeTagText",
@@ -597,7 +780,7 @@ function showViewTreeIntroPrompt() {
     {
       message: `
         ✅ <strong>Nice work!</strong><br>
-        You’ve just explored every part of the <strong>tree info screen</strong> — including species, health, and location.<br><br>
+        You've just explored every part of the <strong>tree info screen</strong> — including species, health, and location.<br><br>
         <button class="groundzy-btn" onclick="closeViewTreeAndStartWizard()">Next Step</button>
       `,
       selectors: [],
@@ -693,8 +876,8 @@ function showWizardIntroModal() {
   modal.innerHTML = `
     <div class="modal-content">
       <h2>🪄🌳 Tree Identifier Wizard</h2>
-      <p>Next, we’ll show you how to identify a tree using Groundzy’s AI-powered wizard — starting with the famous <strong>Lone Cypress</strong> 🌲</p>
-      <p><strong>Not a fan of scenic flights?</strong> You can tap “Skip Fly” anytime during the trip to jump ahead instantly.</p>
+      <p>Next, we'll show you how to identify a tree using Groundzy's AI-powered wizard — starting with the famous <strong>Lone Cypress</strong> 🌲</p>
+      <p><strong>Not a fan of scenic flights?</strong> You can tap "Skip Fly" anytime during the trip to jump ahead instantly.</p>
       <div class="modal-actions">
         <button class="groundzy-btn" onclick="startWizardFlyToLoneCypress()">Next</button>
       </div>
@@ -714,7 +897,7 @@ function startWizardFlyToLoneCypress() {
     "🛰️ Groundzy One is cleared for takeoff.",
     "🎒 Please return your tray tables to the upright position.",
     "🪂 Hope you packed a parachute.",
-    "🐦 Bird’s-eye view activated!",
+    "🐦 Bird's-eye view activated!",
     "🎡 WHEEEEEE!!!",
   ];
 
@@ -741,6 +924,12 @@ function startWizardFlyToLoneCypress() {
   // 🗺️ Map flight
   const sherman = { lat: 36.58151678691618, lng: -118.7518612801296 };
   const loneCypress = { lat: 36.56875255038538, lng: -121.96523806032035 };
+
+  const map = window.mapManager?.getMap();
+  if (!map) {
+    console.error('❌ Map not available for tutorial flight');
+    return;
+  }
 
   map.setCenter(sherman);
   map.setZoom(19);
@@ -806,8 +995,11 @@ function startWizardFlyToLoneCypress() {
     flyTimeouts.forEach(clearTimeout);
     flyPrompt?.remove();
     skipBtn?.remove();
-    map.setCenter(loneCypress);
-    map.setZoom(19);
+    const map = window.mapManager?.getMap();
+    if (map) {
+      map.setCenter(loneCypress);
+      map.setZoom(19);
+    }
     showLoneCypressIntro(); // skip a step number
   });
 }
@@ -847,8 +1039,8 @@ function showLoneCypressIntro() {
   modal.innerHTML = `
     <div class="modal-content">
       <h2>🌲 The Lone Cypress</h2>
-      <p>This is the iconic <strong>Lone Cypress</strong> — standing for over 250 years on California’s coast.</p>
-      <p>Let’s identify it using Groundzy’s <strong>Tree Wizard</strong>.</p>
+      <p>This is the iconic <strong>Lone Cypress</strong> — standing for over 250 years on California's coast.</p>
+      <p>Let's identify it using Groundzy's <strong>Tree Wizard</strong>.</p>
       <div class="modal-actions">
         <button class="groundzy-btn" onclick="goToTreeWizard()">Next</button>
       </div>
@@ -917,9 +1109,9 @@ function showWizardInstructions() {
         🍎 Fruit<br>
         🌳 Bark
       </p>
-      <p>Groundzy’s wizard will use AI and expert data to find the closest species match.</p>
+      <p>Groundzy's wizard will use AI and expert data to find the closest species match.</p>
       <div class="modal-actions">
-        <button class="groundzy-btn" onclick="startWizardScroll()">Got It – Let’s Identify!</button>
+        <button class="groundzy-btn" onclick="startWizardScroll()">Got It – Let's Identify!</button>
       </div>
     </div>
   `;
@@ -982,7 +1174,7 @@ function openTutorialTreeWizard() {
   prompt.style.zIndex = "2000";
   prompt.innerHTML = `
     🧪 We've added two sample photos of the <strong>Lone Cypress</strong> for you.<br><br>
-    Now tap the <strong>Identify</strong> button below to let Groundzy’s AI wizard analyze them and suggest a match!
+    Now tap the <strong>Identify</strong> button below to let Groundzy's AI wizard analyze them and suggest a match!
   `;
 
   setTimeout(() => {
@@ -1116,8 +1308,8 @@ function showAddIdentifiedTreePrompt(retries = 10) {
       addPrompt.style.zIndex = "2000";
       addPrompt.style.maxWidth = "260px";
       addPrompt.style.textAlign = "center";
-      addPrompt.innerHTML = `Tap the <strong>“+” button</strong> below to add the <strong>Lone Cypress</strong> to your map.<br><br>
-        We’ll pre-fill your entry with the ID results!
+      addPrompt.innerHTML = `Tap the <strong>"+" button</strong> below to add the <strong>Lone Cypress</strong> to your map.<br><br>
+        We'll pre-fill your entry with the ID results!
       `;
       document.body.appendChild(addPrompt);
 
@@ -1146,6 +1338,7 @@ function showStep16_AddTreeModal() {
   const loneCypressLng = -121.96523806032035;
 
   // 🌍 Move map to location
+  const map = window.mapManager?.getMap();
   if (map) {
     map.setCenter({ lat: loneCypressLat, lng: loneCypressLng });
     map.setZoom(19);
@@ -1156,14 +1349,30 @@ function showStep16_AddTreeModal() {
   window.tutorialStep = 16;
 
   // 🪄 Open Add Tree Modal
-  openTreeModal();
+  if (typeof openTreeModal === 'function') {
+    openTreeModal();
+  } else if (window.treeManager && typeof window.treeManager.openTreeModal === 'function') {
+    window.treeManager.openTreeModal();
+  } else {
+    console.error('❌ openTreeModal not available in tutorial');
+    alert('Tree modal not ready. Please refresh the page.');
+    return;
+  }
 
   // 🧩 Fill out basic info
   document.getElementById("treeSpecies").value = "Monterey Cypress";
   document.getElementById("treeType").value = "Tree";
   document.getElementById("treeLatitude").value = loneCypressLat.toFixed(6);
   document.getElementById("treeLongitude").value = loneCypressLng.toFixed(6);
-  autofillSpeciesDetails("Monterey Cypress");
+  
+  // Safely call autofillSpeciesDetails if available
+  try {
+    if (window.treeManager && typeof window.treeManager.autofillSpeciesDetails === 'function') {
+      window.treeManager.autofillSpeciesDetails("Monterey Cypress");
+    }
+  } catch (error) {
+    console.log('⚠️ autofillSpeciesDetails not available:', error.message);
+  }
 
   // 💾 Highlight Save Button
   const saveBtn = document.getElementById("saveTreeBtn");
@@ -1186,7 +1395,7 @@ function showStep16_AddTreeModal() {
   prompt.style.borderRadius = "12px";
   prompt.style.boxShadow = "0 4px 12px rgba(0,0,0,0.3)";
   prompt.style.zIndex = "2000";
-  prompt.innerHTML = `💾 Tap <strong>“Save”</strong> to finish adding your first tree!`;
+  prompt.innerHTML = `💾 Tap <strong>"Save"</strong> to finish adding your first tree!`;
   document.body.appendChild(prompt);
 
   // 🧪 Simulate save without Firebase
@@ -1203,11 +1412,17 @@ function showStep16_AddTreeModal() {
 
       // 🧪 Simulate fake marker & success modal
       setTimeout(() => {
-        closeTreeModal();
-        simulateTutorialMarker(loneCypressLat, loneCypressLng);
-        showStep16CongratsModal();
-        saveBtn.disabled = false;
-        saveBtn.innerHTML = "💾 Save";
+        try {
+          window.treeManager?.closeTreeModal();
+          simulateTutorialMarker(loneCypressLat, loneCypressLng);
+          showStep16CongratsModal();
+        } catch (error) {
+          console.error('❌ Error in tutorial save simulation:', error);
+        } finally {
+          // Always reset the save button
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = "💾 Save";
+        }
       }, 1200);
     },
     { once: true }
@@ -1216,6 +1431,12 @@ function showStep16_AddTreeModal() {
 
 function simulateTutorialMarker(lat, lng) {
   const iconUrl = "https://gzadmin-93.github.io/tree-icons/icon-117.svg";
+  const map = window.mapManager?.getMap();
+  
+  if (!map) {
+    console.error('❌ Map not available for tutorial marker');
+    return;
+  }
 
   const marker = new google.maps.Marker({
     position: { lat, lng },
@@ -1241,7 +1462,7 @@ function showStep16CongratsModal() {
     <div class="modal-content">
       <h2>🎉 Nice Work!</h2>
       <p>You just saved your first tree entry on the Groundzy map — a legendary <strong>Monterey Cypress</strong>.</p>
-      <p>Let’s finish up and return home to start your journey!</p>
+      <p>Let's finish up and return home to start your journey!</p>
       <div class="modal-actions">
         <button class="groundzy-btn" onclick="goToFinalTutorialStep()">Next Step</button>
       </div>
@@ -1311,10 +1532,10 @@ function showFinalConfettiStep() {
   modal.innerHTML = `
     <div class="modal-content">
       <h2>🎓 Tutorial Complete!</h2>
-      <p>You’ve added your first tree, explored key features, and learned how to use Groundzy’s tools like a pro.</p>
+      <p>You've added your first tree, explored key features, and learned how to use Groundzy's tools like a pro.</p>
       <p>You're now ready to start mapping your own trees 🌳💪</p>
       <div class="modal-actions">
-        <button class="groundzy-btn" onclick="completeGroundzyTutorial()">Let’s Go!</button>
+        <button class="groundzy-btn" onclick="completeGroundzyTutorial()">Let's Go!</button>
       </div>
     </div>
   `;
@@ -1322,6 +1543,12 @@ function showFinalConfettiStep() {
 }
 function completeGroundzyTutorial() {
   document.getElementById("tutorialCompleteModal")?.remove();
+
+  // 🧹 Clean up tutorial marker
+  if (window.tutorialTreeMarker) {
+    window.tutorialTreeMarker.setMap(null);
+    window.tutorialTreeMarker = null;
+  }
 
   // ✅ Update Firebase flag
   const user = firebase.auth().currentUser;

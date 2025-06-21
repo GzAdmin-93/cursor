@@ -2,6 +2,8 @@
 // 🔐 AUTHENTICATION MODULE
 // ============================
 
+console.log('🔐 Auth module loading...');
+
 import { db } from '../config/firebase.js';
 
 export class AuthManager {
@@ -30,10 +32,14 @@ export class AuthManager {
             const userData = userDoc.data();
             this.currentDatabaseCode = userData.databaseCode || null;
             
-            // Check tutorial status
-            if (!userData.hasCompletedTutorial) {
+            // Check tutorial status - start if false or undefined
+            if (userData.hasCompletedTutorial !== true) {
               setTimeout(() => {
-                this.showTutorialWelcomeModal();
+                if (typeof window.showTutorialWelcomeModal === 'function') {
+                  window.showTutorialWelcomeModal();
+                } else {
+                  console.log('Tutorial function not available yet');
+                }
               }, 1500);
             }
             

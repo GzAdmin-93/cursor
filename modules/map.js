@@ -2,7 +2,7 @@
 // 🗺️ MAP MANAGEMENT MODULE
 // ============================
 
-import { authManager } from './auth.js';
+console.log('🗺️ Map module loading...');
 
 export class MapManager {
   constructor() {
@@ -16,14 +16,21 @@ export class MapManager {
 
   // Initialize Google Maps
   init() {
-    const center = { lat: 41.723158305053474, lng: -88.06867936825057 };
-    
-    this.map = new google.maps.Map(document.getElementById("map"), {
+    const mapElement = document.getElementById("map");
+    if (!mapElement) {
+      console.error("Map element not found");
+      return;
+    }
+
+    this.map = new google.maps.Map(mapElement, {
+      center: { lat: 41.723158305053474, lng: -88.06867936825057 },
       zoom: 11,
-      center: center,
       mapTypeId: "hybrid",
       disableDefaultUI: true,
       zoomControl: false,
+      streetViewControl: false,
+      mapTypeControl: false,
+      fullscreenControl: false,
       tilt: 0,
       heading: 0,
       styles: [
@@ -39,11 +46,47 @@ export class MapManager {
       ],
     });
 
+    // Initialize center pin positioning
+    this.initCenterPin();
+    
+    console.log("🗺️ Map initialized");
+
     this.setupSearchBox();
     this.setupMapListeners();
     this.checkJumpToTree();
     
     return this.map;
+  }
+
+  initCenterPin() {
+    const centerPin = document.getElementById("centerPin");
+    if (!centerPin) return;
+
+    // Position center pin at map center
+    const updateCenterPinPosition = () => {
+      const mapDiv = document.getElementById("map");
+      if (!mapDiv) return;
+
+      const rect = mapDiv.getBoundingClientRect();
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      centerPin.style.position = "absolute";
+      centerPin.style.left = `${centerX}px`;
+      centerPin.style.top = `${centerY}px`;
+      centerPin.style.transform = "translate(-50%, -55%)";
+      centerPin.style.zIndex = "500";
+      centerPin.style.pointerEvents = "none";
+    };
+
+    // Update position on map bounds changed
+    this.map.addListener("bounds_changed", updateCenterPinPosition);
+    
+    // Update position on window resize
+    window.addEventListener("resize", updateCenterPinPosition);
+    
+    // Initial position
+    updateCenterPinPosition();
   }
 
   // Setup search functionality
@@ -178,9 +221,14 @@ export class MapManager {
 
   // Update marker visibility based on zoom
   updateMarkerVisibility() {
+    if (!window.authManager) {
+      console.warn('⚠️ authManager not ready, skipping marker visibility update');
+      return;
+    }
+    
     const zoomLevel = this.map.getZoom();
-    const isAdmin = authManager.isAdmin();
-    const databaseCode = authManager.getDatabaseCode();
+    const isAdmin = window.authManager.isAdmin();
+    const databaseCode = window.authManager.getDatabaseCode();
 
     this.allTreeMarkers.forEach(({ marker, data }) => {
       const isUserTree = isAdmin || 
@@ -197,7 +245,12 @@ export class MapManager {
 
   // Update tree legend
   updateTreeLegend() {
-    if (!this.map || !authManager.getDatabaseCode() || this.map.getZoom() < 14) {
+    if (!window.authManager) {
+      console.warn('⚠️ authManager not ready, skipping tree legend update');
+      return;
+    }
+    
+    if (!this.map || !window.authManager.getDatabaseCode() || this.map.getZoom() < 14) {
       const legendBox = document.getElementById("treeLegend");
       legendBox.innerHTML = "";
       legendBox.classList.add("hidden");
@@ -206,9 +259,17 @@ export class MapManager {
 
     const bounds = this.map.getBounds();
     const visibleSpecies = new Map();
+    const userCode = window.authManager.getDatabaseCode();
+    const isAdmin = window.authManager.isAdmin();
 
     this.allTreeMarkers.forEach(({ marker, data }) => {
       if (!bounds.contains(marker.getPosition())) return;
+
+      const isUserTree = isAdmin || 
+                        data.databaseCode === userCode ||
+                        data.databaseCode === "public-demo";
+
+      if (!isUserTree) return;
 
       const name = data.commonName || data.species || "Unknown";
       const icon = data.iconFile || "icon_undefined.svg";
